@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.github.pires.example</groupId>
+    <artifactId>fabric8-amq-example</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>itests</artifactId>
+  <name>Fabric8 ActiveMQ Integration tests</name>
+  <packaging>bundle</packaging>
+  
+  <dependencies>
+    <dependency>
+      <groupId>io.fabric8.mq</groupId>
+      <artifactId>mq-fabric</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8.mq</groupId>
+      <artifactId>mq-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>fabric-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>fabric8-karaf</artifactId>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8.itests</groupId>
+      <artifactId>fabric-itests-common</artifactId>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.servicemix.tooling</groupId>
+        <artifactId>depends-maven-plugin</artifactId>
+        <version>1.2</version>
+        <executions>
+          <execution>
+            <id>generate-depends-file</id>
+            <goals>
+              <goal>generate-depends-file</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

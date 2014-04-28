@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.github.pires.example</groupId>
+    <artifactId>fabric8-amq-example</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>client-impl</artifactId>
+  <name>Fabric8 ActiveMQ Client implementation</name>
+  <packaging>bundle</packaging>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.pires.example</groupId>
+      <artifactId>client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8.mq</groupId>
+      <artifactId>mq-client</artifactId>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-scr-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <properties>
+    <osgi.import.pkg>!org.apache.felix.scr.annotations*, *</osgi.import.pkg>
+    <osgi.export.pkg>com.github.pires.example.client</osgi.export.pkg>
+    <osgi.private.pkg></osgi.private.pkg>
+    <osgi.service.component>OSGI-INF/*</osgi.service.component>
+  </properties>
+
+</project>

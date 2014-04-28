@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.pires.example</groupId>
+  <artifactId>fabric8-amq-example</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Fabric8 ActiveMQ (JMS) example with integration-tests (pax-exam)</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+    <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
+    <build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
+    <java.version>1.7</java.version>
+    <scr-plugin.version>1.16.0</scr-plugin.version>
+    <scr-annotations-version>1.9.8</scr-annotations-version>
+    <slf4j.version>1.7.5</slf4j.version>
+    <log4j.version>1.2.17</log4j.version>
+
+    <!-- Testing stuff -->
+    <fabric8.version>1.1.0.Beta4</fabric8.version>
+
+    <!-- OSGi stuff -->
+    <felix-plugin.version>2.4.0</felix-plugin.version>
+    <osgi.version>5.0.0</osgi.version>
+  </properties>
+
+  <modules>
+    <module>client</module>
+    <module>client.impl</module>
+    <module>itests</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.scr.annotations</artifactId>
+        <version>${scr-annotations-version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <!-- OSGi -->
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>${osgi.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.compendium</artifactId>
+        <version>${osgi.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.enterprise</artifactId>
+        <version>${osgi.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- Modules -->
+      <dependency>
+        <groupId>com.github.pires.example</groupId>
+        <artifactId>client</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- Others -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.5</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8.mq</groupId>
+        <artifactId>mq-fabric</artifactId>
+        <version>${fabric8.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8.mq</groupId>
+        <artifactId>mq-client</artifactId>
+        <version>${fabric8.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>fabric-api</artifactId>
+        <version>${fabric8.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>fabric8-karaf</artifactId>
+        <version>${fabric8.version}</version>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8.itests</groupId>
+        <artifactId>fabric-itests-common</artifactId>
+        <version>${fabric8.version}</version>
+      </dependency>
+
+      <!-- Testing -->
+      <dependency>
+        <groupId>io.fabric8.bom</groupId>
+        <artifactId>fabric8-bom</artifactId>
+        <version>${fabric8.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <inherited>false</inherited>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <header>${basedir}/COPYRIGHT</header>
+          <strictCheck>true</strictCheck>
+          <includes>
+            <include>**/src/main/java/**/*.java</include>
+            <include>**/src/test/java/**/*.java</include>
+            <include>**/src/main/**/*.xml</include>
+            <include>**/src/test/**/*.xml</include>
+          </includes>
+          <useDefaultExcludes>true</useDefaultExcludes>
+          <encoding>UTF-8</encoding>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <optimize>true</optimize>
+          <debug>true</debug>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>${maven-resources-plugin.version}</version>
+        <configuration>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${felix-plugin.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-Name>${project.name}</Bundle-Name>
+            <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+            <Implementation-Version>${project.version}</Implementation-Version>
+            <Import-Package>${osgi.import.pkg}</Import-Package>
+            <Export-Package>${osgi.export.pkg}</Export-Package>
+            <Private-Package>${osgi.private.pkg}</Private-Package>
+            <DynamicImport-Package>${osgi.dynamic.pkg}</DynamicImport-Package>
+            <_failok>true</_failok>
+            <Require-Bundle>${osgi.require.bundle}</Require-Bundle>
+            <Export-Service>${osgi.services.export}</Export-Service>
+            <Embed-Dependency>${osgi.embed.dependency}</Embed-Dependency>
+            <Embed-Transitive>${osgi.embed.transitive}</Embed-Transitive>
+            <Require-Bundle>${osgi.require.bundle}</Require-Bundle>
+            <Require-Capability>${osgi.capabilities.require}</Require-Capability>
+            <Provide-Capability>${osgi.capabilities.provide}</Provide-Capability>
+            <Service-Component>${osgi.service.component}</Service-Component>
+            <_removeheaders>Import-Service</_removeheaders>
+            <Meta-Persistence>${osgi.meta.persistence}</Meta-Persistence>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-scr-plugin</artifactId>
+          <version>${scr-plugin.version}</version>
+          <executions>
+            <execution>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>scr</goal>
+              </goals>
+              <configuration>
+                <specVersion>1.2</specVersion>
+                <strictMode>false</strictMode>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+</project>
