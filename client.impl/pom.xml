@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>client-impl</artifactId>
-  <name>Fabric8 ActiveMQ Client implementation</name>
+  <name>Fabric8 ActiveMQ Client example implementation</name>
   <packaging>bundle</packaging>
   
   <dependencies>
@@ -28,8 +28,10 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.fabric8.mq</groupId>
-      <artifactId>mq-client</artifactId>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-all</artifactId>
+      <version>5.9.1</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   

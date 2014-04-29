@@ -11,10 +11,15 @@
   </parent>
 
   <artifactId>itests</artifactId>
-  <name>Fabric8 ActiveMQ Integration tests</name>
+  <name>Fabric8 ActiveMQ Client example Integration Tests</name>
   <packaging>bundle</packaging>
   
   <dependencies>
+    <dependency>
+      <groupId>com.github.pires.example</groupId>
+      <artifactId>client</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>io.fabric8.mq</groupId>
       <artifactId>mq-fabric</artifactId>

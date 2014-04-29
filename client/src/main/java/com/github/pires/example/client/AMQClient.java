@@ -12,13 +12,13 @@
  */
 package com.github.pires.example.client;
 
+import java.io.Serializable;
+
 /**
  * AMQ client service specification.
  */
 public interface AMQClient {
 
-  public void publish(String message);
-
-  public void consume();
+  public void publish(Serializable message);
 
 }

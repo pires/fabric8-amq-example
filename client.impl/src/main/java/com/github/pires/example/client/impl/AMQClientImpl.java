@@ -13,17 +13,19 @@
 package com.github.pires.example.client.impl;
 
 import com.github.pires.example.client.AMQClient;
-import io.fabric8.mq.ActiveMQService;
-import io.fabric8.mq.ConsumerThread;
-import io.fabric8.mq.ProducerThread;
+import java.io.Serializable;
 import java.util.Map;
+import javax.jms.Connection;
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Modified;
 import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,28 +33,26 @@ import org.slf4j.LoggerFactory;
  * Implementation of {@link AMQClient} service.
  */
 @Component(name = "com.github.pires.example.client",
-    label = "ActiveMQ Client Factory",
-    configurationFactory = true,
-    immediate = true,
-    metatype = true)
+    label = "Test ActiveMQ Client",
+    immediate = true)
+@Service(AMQClient.class)
 public class AMQClientImpl implements AMQClient {
 
   private static final Logger log = LoggerFactory.getLogger(AMQClient.class);
 
-  ConsumerThread consumer;
-  ProducerThread producer;
-  ActiveMQService jmsService;
   @Reference(referenceInterface = ActiveMQConnectionFactory.class)
   private ActiveMQConnectionFactory connectionFactory;
+  private Connection jmsConnection;
+  private Session jmsSession;
+  private JMSProducer producer;
+  private JMSConsumer consumer;
 
-  @Override
-  public void publish(String message) {
-    // TODO
-  }
-
-  @Override
-  public void consume() {
-    // TODO
+  public void publish(Serializable message) {
+    try {
+      producer.send(message);
+    } catch (JMSException e) {
+      log.error("There was an error while sending a message.", e);
+    }
   }
 
   @Activate
@@ -71,34 +71,30 @@ public class AMQClientImpl implements AMQClient {
     deactivateInternal();
   }
 
-  protected void deactivateInternal() {
-    if (consumer != null) {
-      consumer.setRunning(false);
-      jmsService.stop();
+  private void deactivateInternal() {
+    try {
+      jmsSession.close();
+      jmsConnection.close();
+      producer = null;
+      consumer = null;
+    } catch (JMSException e) {
+      log.error("There was an exception while clearing JMS resources.", e);
     }
   }
 
-  private void updateInternal(Map<String, ?> configuration) throws Exception {
-    try {
-      // get JMS up and running
-      jmsService = new ActiveMQService(connectionFactory);
-      jmsService.setMaxAttempts(10);
-      jmsService.start();
-      String destination = (String) configuration.get("destination");
-
-      // get a producer thread
-      producer = new ProducerThread(jmsService, destination);
-      producer.setSleep(500);
-      producer.start();
-      log.info("Producer started");
-
-      // get a consumer thread
-      consumer = new ConsumerThread(jmsService, destination);
-      consumer.start();
-      log.info("Consumer started");
-    } catch (JMSException e) {
-      throw new Exception("Cannot start JMS..", e);
+  private void updateInternal(Map<String, ?> configuration) throws JMSException {
+    // get JMS up and running
+    jmsConnection = connectionFactory.createQueueConnection();
+    jmsSession = jmsConnection.createSession(true, Session.AUTO_ACKNOWLEDGE);
+    final String queueName = "test";
+    Destination destination = null;
+    if (queueName != null && !queueName.isEmpty()) {
+      destination = jmsSession.createQueue(queueName);
+    } else {
+      throw new JMSException("Can't find queueName in AMQClient configuration.");
     }
+    producer = new JMSProducer(jmsSession, destination);
+    consumer = new JMSConsumer(jmsSession, destination);
   }
 
 }
