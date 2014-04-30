@@ -85,16 +85,13 @@ public class AMQClientTest extends FabricTestSupport {
     // assign container to broker
     err.println(executeCommand("mq-create --assign-container root --group a broker1"));
 
-    Thread.sleep(2000);
-
     err.println(executeCommand("osgi:install -s mvn:com.github.pires.example/client/0.1-SNAPSHOT"));
     err.println(executeCommand("osgi:install -s mvn:com.github.pires.example/client-impl/0.1-SNAPSHOT"));
 
-    err.println("Sleeping for 10 seconds...");
-    Thread.sleep(10000);
+    err.println("Sleeping for 5 seconds...");
+    Thread.sleep(5000);
 
-    err.println(executeCommand("scr:list | grep example"));
-    err.println(executeCommand("osgi:ls | grep example"));
+    err.println(executeCommand("osgi:list | grep example"));
   }
 
   @After

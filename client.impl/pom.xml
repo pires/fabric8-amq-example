@@ -47,8 +47,8 @@
   <properties>
     <osgi.import.pkg>!org.apache.felix.scr.annotations*, *</osgi.import.pkg>
     <osgi.export.pkg></osgi.export.pkg>
-    <osgi.private.pkg>com.github.pires.example.client</osgi.private.pkg>
     <osgi.service.component>OSGI-INF/*</osgi.service.component>
+    <osgi.private.pkg>com.github.pires.example.client.impl</osgi.private.pkg>
   </properties>
 
 </project>

@@ -71,12 +71,6 @@
         <version>${project.version}</version>
         <scope>provided</scope>
       </dependency>
-      <dependency>
-        <groupId>com.github.pires.example</groupId>
-        <artifactId>client-impl</artifactId>
-        <version>${project.version}</version>
-        <scope>provided</scope>
-      </dependency>
 
       <!-- Others -->
       <dependency>
@@ -84,41 +78,6 @@
         <artifactId>slf4j-api</artifactId>
         <version>1.7.5</version>
         <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8.mq</groupId>
-        <artifactId>mq-fabric</artifactId>
-        <version>${fabric8.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8.mq</groupId>
-        <artifactId>mq-client</artifactId>
-        <version>${fabric8.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>fabric-api</artifactId>
-        <version>${fabric8.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>fabric8-karaf</artifactId>
-        <version>${fabric8.version}</version>
-        <type>zip</type>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8.itests</groupId>
-        <artifactId>fabric-itests-common</artifactId>
-        <version>${fabric8.version}</version>
-      </dependency>
-
-      <!-- Testing -->
-      <dependency>
-        <groupId>io.fabric8.bom</groupId>
-        <artifactId>fabric8-bom</artifactId>
-        <version>${fabric8.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

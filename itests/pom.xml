@@ -23,33 +23,46 @@
     <dependency>
       <groupId>com.github.pires.example</groupId>
       <artifactId>client-impl</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.fabric8.mq</groupId>
       <artifactId>mq-fabric</artifactId>
+      <version>${fabric8.version}</version>
     </dependency>
     <dependency>
       <groupId>io.fabric8.mq</groupId>
       <artifactId>mq-client</artifactId>
+      <version>${fabric8.version}</version>
     </dependency>
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>fabric-api</artifactId>
+      <version>${fabric8.version}</version>
     </dependency>
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>fabric8-karaf</artifactId>
+      <version>${fabric8.version}</version>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>io.fabric8.itests</groupId>
       <artifactId>fabric-itests-common</artifactId>
+      <version>${fabric8.version}</version>
     </dependency>
   </dependencies>
   
+  <properties>
+    <osgi.import.pkg>*</osgi.import.pkg>
+    <osgi.export.pkg>!*</osgi.export.pkg>
+    <osgi.private.pkg>com.github.pires.example.client.test</osgi.private.pkg>
+  </properties>
+
   <build>
     <plugins>
+      <!-- generate dependencies versions -->
       <plugin>
         <groupId>org.apache.servicemix.tooling</groupId>
         <artifactId>depends-maven-plugin</artifactId>
