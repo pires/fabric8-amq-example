@@ -49,12 +49,16 @@ public class JMSProducer {
     log.info("Initializing JMS producer..");
     try {
       producer = jmsSession.createProducer(destination);
-      producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+      producer.setDeliveryMode(DeliveryMode.PERSISTENT);
     } catch (JMSException e) {
       log.error("There was an error while initializating JMS producer.", e);
       throw e;
     }
     log.info("JMS producer successfuly initialized.");
+  }
+
+  public void stop() throws JMSException {
+    producer.close();
   }
 
   /**
@@ -66,6 +70,7 @@ public class JMSProducer {
   public void send(final Serializable obj) throws JMSException {
     ObjectMessage message = jmsSession.createObjectMessage(obj);
     producer.send(message);
+    log.info("Message sent successfully to queue.");
   }
 
 }

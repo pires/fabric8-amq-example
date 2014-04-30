@@ -21,4 +21,6 @@ public interface AMQClient {
 
   public void publish(Serializable message);
 
+  public long getConsumedMessagesTotal();
+
 }

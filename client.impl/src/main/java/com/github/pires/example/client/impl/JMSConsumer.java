@@ -12,6 +12,7 @@
  */
 package com.github.pires.example.client.impl;
 
+import java.util.concurrent.atomic.AtomicLong;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -27,6 +28,8 @@ import org.slf4j.LoggerFactory;
 public class JMSConsumer implements MessageListener {
 
   private static final Logger log = LoggerFactory.getLogger(JMSConsumer.class);
+
+  private final AtomicLong consumedMessagesCount = new AtomicLong(0);
 
   private final Session jmsSession;
   private final Destination destination;
@@ -56,12 +59,22 @@ public class JMSConsumer implements MessageListener {
     log.info("JMS consumer successfuly initialized.");
   }
 
+  public void stop() throws JMSException {
+    consumer.close();
+  }
+
   public void onMessage(Message message) {
+    log.info("Handling incoming message..");
     try {
-      log.info("New message received with ID {}.", message.getJMSMessageID());
+      log.info("Message {}", message.getJMSMessageID());
+      consumedMessagesCount.getAndIncrement();
     } catch (JMSException e) {
       log.error("There was an error while processing incoming message.", e);
     }
+  }
+
+  public long getConsumedMessagesTotal() {
+    return consumedMessagesCount.longValue();
   }
 
 }

@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -55,6 +56,11 @@ public class AMQClientImpl implements AMQClient {
     }
   }
 
+  @Override
+  public long getConsumedMessagesTotal() {
+    return consumer.getConsumedMessagesTotal();
+  }
+
   @Activate
   void activate(Map<String, ?> configuration) throws Exception {
     updateInternal(configuration);
@@ -73,10 +79,10 @@ public class AMQClientImpl implements AMQClient {
 
   private void deactivateInternal() {
     try {
+      producer.stop();
+      consumer.stop();
       jmsSession.close();
       jmsConnection.close();
-      producer = null;
-      consumer = null;
     } catch (JMSException e) {
       log.error("There was an exception while clearing JMS resources.", e);
     }
@@ -85,16 +91,18 @@ public class AMQClientImpl implements AMQClient {
   private void updateInternal(Map<String, ?> configuration) throws JMSException {
     // get JMS up and running
     jmsConnection = connectionFactory.createQueueConnection();
-    jmsSession = jmsConnection.createSession(true, Session.AUTO_ACKNOWLEDGE);
-    final String queueName = "test";
-    Destination destination = null;
-    if (queueName != null && !queueName.isEmpty()) {
-      destination = jmsSession.createQueue(queueName);
-    } else {
-      throw new JMSException("Can't find queueName in AMQClient configuration.");
-    }
+    jmsConnection.setExceptionListener(new ExceptionListener() {
+      @Override
+      public void onException(JMSException e) {
+        log.error("There was an error while working with JMS.", e);
+      }
+    });
+    jmsSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    Destination destination = jmsSession.createQueue("test");
+
     producer = new JMSProducer(jmsSession, destination);
     consumer = new JMSConsumer(jmsSession, destination);
+    jmsConnection.start();
   }
 
 }

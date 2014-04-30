@@ -16,12 +16,14 @@ import com.github.pires.example.client.AMQClient;
 import io.fabric8.api.Container;
 import io.fabric8.api.FabricService;
 import io.fabric8.api.Profile;
+import io.fabric8.api.ServiceLocator;
 import io.fabric8.api.ServiceProxy;
 import io.fabric8.itests.paxexam.support.FabricTestSupport;
 import static io.fabric8.tooling.testing.pax.exam.karaf.FabricKarafTestSupport.executeCommand;
 import static java.lang.System.err;
 import javax.jms.JMSException;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,31 +31,22 @@ import org.junit.runner.RunWith;
 import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.ExamReactorStrategy;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.UrlReference;
-import org.ops4j.pax.exam.spi.reactors.EagerSingleStagedReactorFactory;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceReference;
 
 @RunWith(JUnit4TestRunner.class)
-@ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
 public class AMQClientTest extends FabricTestSupport {
 
-  ServiceProxy<FabricService> fabricService;
+  private ServiceProxy<FabricService> fabricService = null;
+  private AMQClient client = null;
 
-  // @ProbeBuilder
-  // public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
-  // probe.setHeader("Service-Component",
-  // "OSGI-INF/com.github.pires.example.client.impl.AMQClientImpl.xml");
-  // return probe;
-  // }
   @Configuration
   public Option[] config() {
     return new Option[] {
         new DefaultCompositeOption(fabricDistributionConfiguration()),
-        scanFeatures(getFabricFeatureUrl(), "scr", "mq-fabric") };
+        scanFeatures(getFabricFeatureUrl(), "scr", "mq-fabric"),
+        mavenBundle("com.github.pires.example", "client").versionAsInProject() };
   }
 
   public static UrlReference getFabricFeatureUrl() {
@@ -62,7 +55,7 @@ public class AMQClientTest extends FabricTestSupport {
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void before() throws InterruptedException {
     fabricService = ServiceProxy.createServiceProxy(bundleContext,
         FabricService.class);
 
@@ -74,7 +67,7 @@ public class AMQClientTest extends FabricTestSupport {
     err.println(executeCommand("container-create-child --jmx-user admin --jmx-password admin --profile mq-broker-a.broker1 root broker1c1"));
     err.println(executeCommand("container-create-child --jmx-user admin --jmx-password admin --profile mq-broker-a.broker1 root broker1c2"));
     // create app profile
-    err.println(executeCommand("profile-create --parents mq-amq --parents mq-client-a --parents mq-client mq-example"));
+    err.println(executeCommand("profile-create --parents mq-client-a --parents mq-client mq-example"));
 
     Container root = fabricService.getService().getContainer("root");
     final Profile profile = fabricService.getService().getProfile("1.0",
@@ -88,10 +81,12 @@ public class AMQClientTest extends FabricTestSupport {
     err.println(executeCommand("osgi:install -s mvn:com.github.pires.example/client/0.1-SNAPSHOT"));
     err.println(executeCommand("osgi:install -s mvn:com.github.pires.example/client-impl/0.1-SNAPSHOT"));
 
-    err.println("Sleeping for 5 seconds...");
-    Thread.sleep(5000);
-
+    err.println("Listing installed bundles state...");
     err.println(executeCommand("osgi:list | grep example"));
+
+    // assert our service is available
+    client = ServiceLocator.awaitService(this.bundleContext, AMQClient.class);
+    assertNotNull(client);
   }
 
   @After
@@ -104,38 +99,15 @@ public class AMQClientTest extends FabricTestSupport {
   }
 
   @Test
-  public void should_send_message() throws JMSException {
-    // assert our bundle is working as expected
-    for (Bundle bundle : bundleContext.getBundles()) {
-      if (bundle.getSymbolicName().contains("pires")) {
-        err.println("Found bundle " + bundle.getSymbolicName());
-        if (bundle.getRegisteredServices() == null) {
-          err.println("No services registered.");
-        } else {
-          err.println("Listing " + bundle.getRegisteredServices().length
-              + " service references..");
-          for (ServiceReference sr : bundle.getRegisteredServices()) {
-            err.println(sr.getClass().getName());
-            if (sr.getUsingBundles() == null) {
-              err.println("No bundles linked to this service reference.");
-            } else {
-              for (Bundle srBundle : sr.getUsingBundles()) {
-                err.println(srBundle.getSymbolicName());
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // AMQClient proxy = ServiceLocator.awaitService(this.bundleContext,
-    // AMQClient.class);
-    // assertNotNull(proxy);
-    ServiceReference<AMQClient> sr = bundleContext
-        .getServiceReference(AMQClient.class);
-    assertNotNull(sr);
-    AMQClient client = bundleContext.getService(sr);
-    assertNotNull(client);
+  public void test_should_send_and_consume_message() throws JMSException,
+      InterruptedException {
+    assertEquals(client.getConsumedMessagesTotal(), 0);
+    // publish a message
     client.publish("123");
+    // wait a little bit for message to hit the queue
+    err.println("Let's give it two seconds for the sent message to be delivered..");
+    Thread.sleep(2000);
+    assertEquals(client.getConsumedMessagesTotal(), 1);
   }
+
 }
