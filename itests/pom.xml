@@ -21,6 +21,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.github.pires.example</groupId>
+      <artifactId>client-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>io.fabric8.mq</groupId>
       <artifactId>mq-fabric</artifactId>
     </dependency>

@@ -71,6 +71,12 @@
         <version>${project.version}</version>
         <scope>provided</scope>
       </dependency>
+      <dependency>
+        <groupId>com.github.pires.example</groupId>
+        <artifactId>client-impl</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+      </dependency>
 
       <!-- Others -->
       <dependency>
